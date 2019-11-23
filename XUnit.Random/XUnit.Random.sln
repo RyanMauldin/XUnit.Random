@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29503.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnit.Random.JsonNetTests", "XUnit.Random.JsonNetTests\XUnit.Random.JsonNetTests.csproj", "{2BF4C14D-6D73-45F2-AE80-7DF7827DE1C3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnit.Random.Extensions", "XUnit.Random.Extensions\XUnit.Random.Extensions.csproj", "{6D4DDF9D-E570-4AA9-A55E-7350E15ECAD2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2BF4C14D-6D73-45F2-AE80-7DF7827DE1C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BF4C14D-6D73-45F2-AE80-7DF7827DE1C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BF4C14D-6D73-45F2-AE80-7DF7827DE1C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BF4C14D-6D73-45F2-AE80-7DF7827DE1C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D4DDF9D-E570-4AA9-A55E-7350E15ECAD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D4DDF9D-E570-4AA9-A55E-7350E15ECAD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D4DDF9D-E570-4AA9-A55E-7350E15ECAD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D4DDF9D-E570-4AA9-A55E-7350E15ECAD2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {25F69B70-4969-47B3-956D-58A3A403DA07}
+	EndGlobalSection
+EndGlobal
