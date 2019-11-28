@@ -58,6 +58,8 @@ namespace XUnit.Random.Extensions
                     return value.ToTitleConvention(cultureInfo);
                 case Convention.Upper:
                     return value.ToUpperConvention(cultureInfo);
+                case Convention.None:
+                    return value;
                 default:
                     throw new NotImplementedException();
             }

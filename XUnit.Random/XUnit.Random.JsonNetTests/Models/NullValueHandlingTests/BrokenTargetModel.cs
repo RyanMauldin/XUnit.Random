@@ -28,5 +28,8 @@ namespace XUnit.Random.JsonNetTests.Models.NullValueHandlingTests
             get => _memberId;
             set => _memberId = value.HasValue && value.Value > 0 ? value : BrokenConstants.DefaultMemberId;
         }
+
+        [JsonProperty(PropertyName = "helpID")]
+        public long HelpId { get; set; }
     }
 }

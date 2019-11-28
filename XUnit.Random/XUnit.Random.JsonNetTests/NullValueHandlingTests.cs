@@ -66,10 +66,10 @@ namespace XUnit.Random.JsonNetTests
         {
             var settings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore, Formatting = Formatting.None };
             var model = new NoAttributesTestModel { NameId = "Omg", NullableDateValueId = null };
-            TestSerializationOutput(model, null, Convention.Pascal);
-            TestSerializationOutput(model, settings, Convention.Pascal);
+            TestSerializationOutput(model);
+            TestSerializationOutput(model, settings);
             settings.Formatting = Formatting.Indented;
-            TestSerializationOutput(model, settings, Convention.Pascal);
+            TestSerializationOutput(model, settings);
         }
 
         [Fact]
@@ -81,7 +81,7 @@ namespace XUnit.Random.JsonNetTests
             long? memberId = 34234234;
             var model = new BrokenTargetModel(memberCode, memberId);
             var serializedModel = JsonConvert.SerializeObject(model, settings);
-            var modelDefinition = model.ToJsonDefinition(settings, Convention.Pascal);
+            var modelDefinition = model.ToJsonDefinition(settings);
             serializedModel.Should().NotBeNullOrWhiteSpace();
             modelDefinition.Should().NotBeNullOrWhiteSpace();
             serializedModel.Should().BeEquivalentTo(modelDefinition);
@@ -97,7 +97,7 @@ namespace XUnit.Random.JsonNetTests
             long? memberId = 34234234;
             var model = new BrokenTargetWithNullHandlingModel(memberCode, memberId);
             var serializedModel = JsonConvert.SerializeObject(model, settings);
-            var modelDefinition = model.ToJsonDefinition(settings, Convention.Pascal);
+            var modelDefinition = model.ToJsonDefinition(settings);
             serializedModel.Should().NotBeNullOrWhiteSpace();
             modelDefinition.Should().NotBeNullOrWhiteSpace();
             serializedModel.Should().BeEquivalentTo(modelDefinition);
@@ -105,7 +105,7 @@ namespace XUnit.Random.JsonNetTests
         }
 
         private static void TestSerializationOutput(INullValueHandlingTestModel model, JsonSerializerSettings settings = null,
-            Convention convention = Convention.Camel, CultureInfo cultureInfo = null)
+            Convention convention = Convention.None, CultureInfo cultureInfo = null)
         {
             var serializedModel = JsonConvert.SerializeObject(model);
             var serializedModelWithSettings = JsonConvert.SerializeObject(model, settings);

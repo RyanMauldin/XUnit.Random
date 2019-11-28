@@ -17,7 +17,7 @@ namespace XUnit.Random.Extensions
         private static readonly StringComparer Comparer = StringComparer.Ordinal;
 
         public static string ToJsonPropertyAttributeName<T>(this T type, string name, JsonSerializerSettings settings = null,
-        Convention convention = Convention.Camel, CultureInfo cultureInfo = null) where T : class
+        Convention convention = Convention.None, CultureInfo cultureInfo = null) where T : class
         {
             // Basic validation.
             if (type == null) throw new ArgumentNullException(nameof(type));
@@ -114,7 +114,7 @@ namespace XUnit.Random.Extensions
         }
 
         public static string ToJsonPropertyDefinition<T>(this T type, string name, JsonSerializerSettings settings = null,
-            Convention convention = Convention.Camel, CultureInfo cultureInfo = null) where T : class
+            Convention convention = Convention.None, CultureInfo cultureInfo = null) where T : class
         {
             // Basic validation.
             if (type == null) throw new ArgumentNullException(nameof(type));
@@ -191,7 +191,7 @@ namespace XUnit.Random.Extensions
         }
 
         public static string ToJsonDefinition<T>(this T type, JsonSerializerSettings settings = null, 
-            Convention convention = Convention.Camel, CultureInfo cultureInfo = null) where T : class
+            Convention convention = Convention.None, CultureInfo cultureInfo = null) where T : class
         {
             // Basic validation.
             if (type == null) throw new ArgumentNullException(nameof(type));
