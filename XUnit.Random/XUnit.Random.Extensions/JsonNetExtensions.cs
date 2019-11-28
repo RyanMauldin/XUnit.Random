@@ -98,7 +98,13 @@ namespace XUnit.Random.Extensions
                     if (!string.IsNullOrEmpty(memberName) && Comparer.Equals(memberName, NullValueHandlingName))
                     {
                         var argumentTypedValue = (NullValueHandling)argumentValue.TypedValue.Value;
-                        if (argumentTypedValue == NullValueHandling.Ignore && isNullPropertyValue) return false;
+                        switch (argumentTypedValue)
+                        {
+                            case NullValueHandling.Include:
+                                return true;
+                            case NullValueHandling.Ignore when isNullPropertyValue:
+                                return false;
+                        }
                     }
                 }
             }
