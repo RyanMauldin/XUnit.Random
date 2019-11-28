@@ -1,7 +1,9 @@
+using System.Globalization;
 using FluentAssertions;
 using Newtonsoft.Json;
 using Xunit;
 using XUnit.Random.Extensions;
+using XUnit.Random.Extensions.Types;
 using XUnit.Random.JsonNetTests.Models.Abstractions;
 using XUnit.Random.JsonNetTests.Models.NullValueHandlingTests;
 
@@ -69,12 +71,13 @@ namespace XUnit.Random.JsonNetTests
             TestSerializationOutput(model, settings);
         }
 
-        private static void TestSerializationOutput(INullValueHandlingTestModel model, JsonSerializerSettings settings = null)
+        private static void TestSerializationOutput(INullValueHandlingTestModel model, JsonSerializerSettings settings = null,
+            Convention convention = Convention.Camel, CultureInfo cultureInfo = null)
         {
             var serializedModel = JsonConvert.SerializeObject(model);
             var serializedModelWithSettings = JsonConvert.SerializeObject(model, settings);
             var modelDefinition = model.ToJsonDefinition();
-            var modelDefinitionWithSettings = model.ToJsonDefinition(settings);
+            var modelDefinitionWithSettings = model.ToJsonDefinition(settings, convention, cultureInfo);
             serializedModel.Should().NotBeNullOrWhiteSpace();
             serializedModelWithSettings.Should().NotBeNullOrWhiteSpace();
             modelDefinition.Should().NotBeNullOrWhiteSpace();

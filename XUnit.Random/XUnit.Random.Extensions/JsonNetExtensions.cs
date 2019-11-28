@@ -2,40 +2,48 @@
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using XUnit.Random.Extensions.Types;
 
 namespace XUnit.Random.Extensions
 {
     public static class JsonNetExtensions
     {
-        public static string ToJsonPropertyAttributeName<T>(this T type, string name)
-            where T : class
+        private const string PropertyName = "PropertyName";
+        private const string RequiredName = "Required";
+        private const string NullValueHandlingName = "NullValueHandling";
+        private static readonly StringComparer Comparer = StringComparer.Ordinal;
+
+        public static string ToJsonPropertyAttributeName<T>(this T type, string name, JsonSerializerSettings settings = null,
+        Convention convention = Convention.Camel, CultureInfo cultureInfo = null) where T : class
         {
             // Basic validation.
             if (type == null) throw new ArgumentNullException(nameof(type));
             if (name == null) throw new ArgumentNullException(nameof(name));
+            if (settings == null) settings = new JsonSerializerSettings();
+            if (cultureInfo == null) cultureInfo = settings.Culture ?? CultureInfo.CurrentCulture;
 
             // Get custom attributes
             var propertyInfo = type.GetType().GetProperty(name);
             var customAttributes = propertyInfo?.CustomAttributes.ToList();
 
             // Check for JsonProperty Attribute
-            var jsonPropertyAttribute = customAttributes?.FirstOrDefault(p => p.AttributeType == typeof(JsonPropertyAttribute));
+            var jsonPropertyAttribute = customAttributes?
+                .FirstOrDefault(customAttribute => customAttribute.AttributeType == typeof(JsonPropertyAttribute));
 
             // Check for JsonProperty Attribute PropertyName Argument
-            var jsonPropertyName = jsonPropertyAttribute?.NamedArguments?.FirstOrDefault(p => p.MemberName == "PropertyName");
+            var jsonPropertyName = jsonPropertyAttribute?.NamedArguments?
+                .FirstOrDefault(namedArgument => Comparer.Equals(namedArgument.MemberName, PropertyName));
             var jsonTypedValue = jsonPropertyName?.TypedValue;
             var propertyName = Convert.ToString(jsonTypedValue?.Value ?? string.Empty);
 
             // Return the JsonProperty Attribute PropertyName Value, otherwise return the provided name parameter value.
-            return string.IsNullOrWhiteSpace(propertyName) ? name.ToCamel() : propertyName;
+            return string.IsNullOrWhiteSpace(propertyName) ? name.ToConvention(convention, cultureInfo) : propertyName;
         }
 
-        public static bool IsEmittedProperty<T>(this T type, string name, JsonSerializerSettings settings = null)
-            where T : class
+        public static bool IsEmittedProperty<T>(this T type, string name, JsonSerializerSettings settings = null) where T : class
         {
             // Basic validation.
             if (type == null) throw new ArgumentNullException(nameof(type));
@@ -49,46 +57,48 @@ namespace XUnit.Random.Extensions
             var customAttributes = propertyInfo?.CustomAttributes.ToList();
 
             // Check for JsonIgnore Attribute
-            var jsonIgnoreAttribute = customAttributes?.FirstOrDefault(p => p.AttributeType == typeof(JsonIgnoreAttribute));
+            var jsonIgnoreAttribute = customAttributes?
+                .FirstOrDefault(customAttribute => customAttribute.AttributeType == typeof(JsonIgnoreAttribute));
             if (jsonIgnoreAttribute != null) return false;
 
             // Check for Required Attribute
-            var jsonRequiredAttribute = customAttributes?.FirstOrDefault(p => p.AttributeType == typeof(JsonRequiredAttribute));
+            var jsonRequiredAttribute = customAttributes?
+                .FirstOrDefault(customAttribute => customAttribute.AttributeType == typeof(JsonRequiredAttribute));
             if (jsonRequiredAttribute != null) return true;
 
             // Check for JsonProperty Attribute
-            var jsonPropertyAttribute = customAttributes?.FirstOrDefault(p => p.AttributeType == typeof(JsonPropertyAttribute));
+            var jsonPropertyAttribute = customAttributes?
+                .FirstOrDefault(customAttribute => customAttribute.AttributeType == typeof(JsonPropertyAttribute));
 
             // Check for JsonProperty Attribute Required Argument
-            const string requiredName = "Required";
-            var requiredArgument = jsonPropertyAttribute?.NamedArguments?.FirstOrDefault(p => StringComparer.Ordinal.Equals(p.MemberName, requiredName));
+            var requiredArgument = jsonPropertyAttribute?.NamedArguments?
+                .FirstOrDefault(namedArgument => Comparer.Equals(namedArgument.MemberName, RequiredName));
             if (requiredArgument.HasValue)
             {
                 // Verify property.
-                var requiredArgumentValue = requiredArgument.GetValueOrDefault();
-                if (requiredArgumentValue.MemberInfo != null)
+                var argumentValue = requiredArgument.GetValueOrDefault();
+                if (argumentValue.MemberInfo != null)
                 {
-                    var requiredArgumentMemberName = requiredArgumentValue.MemberName;
-                    if (!string.IsNullOrEmpty(requiredArgumentMemberName) && StringComparer.Ordinal.Equals(requiredArgumentMemberName, requiredName))
+                    var memberName = argumentValue.MemberName;
+                    if (!string.IsNullOrEmpty(memberName) && Comparer.Equals(memberName, RequiredName))
                         return true;
                 }
             }
 
             // Check for JsonProperty Attribute NullValueHandling Argument
-            const string nullValueHandlingName = "NullValueHandling";
-            var nullValueHandlingArgument = jsonPropertyAttribute?.NamedArguments?.FirstOrDefault(p => StringComparer.Ordinal.Equals(p.MemberName, nullValueHandlingName));
+            var nullValueHandlingArgument = jsonPropertyAttribute?.NamedArguments?
+                .FirstOrDefault(namedArgument => Comparer.Equals(namedArgument.MemberName, NullValueHandlingName));
             if (nullValueHandlingArgument.HasValue)
             {
                 // Verify property.
-                var nullValueHandlingArgumentValue = nullValueHandlingArgument.GetValueOrDefault();
-                if (nullValueHandlingArgumentValue.MemberInfo != null)
+                var argumentValue = nullValueHandlingArgument.GetValueOrDefault();
+                if (argumentValue.MemberInfo != null)
                 {
-                    var nullValueHandlingArgumentMemberName = nullValueHandlingArgumentValue.MemberName;
-                    if (!string.IsNullOrEmpty(nullValueHandlingArgumentMemberName) && StringComparer.Ordinal.Equals(nullValueHandlingArgumentMemberName, nullValueHandlingName))
+                    var memberName = argumentValue.MemberName;
+                    if (!string.IsNullOrEmpty(memberName) && Comparer.Equals(memberName, NullValueHandlingName))
                     {
-
-                        var nullValueHandlingArgumentTypedValue = (NullValueHandling)nullValueHandlingArgumentValue.TypedValue.Value;
-                        if (nullValueHandlingArgumentTypedValue == NullValueHandling.Ignore) return false;
+                        var argumentTypedValue = (NullValueHandling)argumentValue.TypedValue.Value;
+                        if (argumentTypedValue == NullValueHandling.Ignore && isNullPropertyValue) return false;
                     }
                 }
             }
@@ -97,13 +107,14 @@ namespace XUnit.Random.Extensions
             return !isNullPropertyValue || settings.NullValueHandling != NullValueHandling.Ignore;
         }
 
-        public static string ToJsonPropertyDefinition<T>(this T type, string name, JsonSerializerSettings settings = null)
-            where T : class
+        public static string ToJsonPropertyDefinition<T>(this T type, string name, JsonSerializerSettings settings = null,
+            Convention convention = Convention.Camel, CultureInfo cultureInfo = null) where T : class
         {
             // Basic validation.
             if (type == null) throw new ArgumentNullException(nameof(type));
             if (name == null) throw new ArgumentNullException(nameof(name));
             if (settings == null) settings = new JsonSerializerSettings();
+            if (cultureInfo == null) cultureInfo = settings.Culture ?? CultureInfo.CurrentCulture;
 
             // Check if property can be emitted.
             var isEmittedProperty = type.IsEmittedProperty(name, settings);
@@ -113,9 +124,10 @@ namespace XUnit.Random.Extensions
             var propertyInfo = type.GetType().GetProperty(name);
             var propertyValue = propertyInfo?.GetValue(type);
             var value = propertyValue.ToJsonPropertyDefinitionValueString(settings);
-            var propertyName = type.ToJsonPropertyAttributeName(name);
-            var indentPadding = settings.Formatting == Formatting.Indented ? "    " : string.Empty;
-            return $@"{indentPadding}""{propertyName}"":{value}";
+            var propertyName = type.ToJsonPropertyAttributeName(name, settings, convention, cultureInfo);
+            var indentPadding = settings.Formatting == Formatting.Indented ? "  " : string.Empty;
+            var propertyPadding = settings.Formatting == Formatting.Indented ? " " : string.Empty;
+            return $@"{indentPadding}""{propertyName}"":{propertyPadding}{value}";
         }
 
         public static string ToJsonPropertyDefinitionValueString<T>(this T value, JsonSerializerSettings settings = null)
@@ -172,22 +184,23 @@ namespace XUnit.Random.Extensions
             }
         }
 
-        public static string ToJsonDefinition<T>(this T type, JsonSerializerSettings settings = null)
-            where T : class
+        public static string ToJsonDefinition<T>(this T type, JsonSerializerSettings settings = null, 
+            Convention convention = Convention.Camel, CultureInfo cultureInfo = null) where T : class
         {
             // Basic validation.
             if (type == null) throw new ArgumentNullException(nameof(type));
             if (settings == null) settings = new JsonSerializerSettings();
+            if (cultureInfo == null) cultureInfo = settings.Culture ?? CultureInfo.CurrentCulture;
 
             // Get Property Definitions.
             var propertyDefinitions = type.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .Where(property => property.CanRead)
-                .Select(property => type.ToJsonPropertyDefinition(property.Name))
+                .Select(property => type.ToJsonPropertyDefinition(property.Name, settings, convention, cultureInfo))
                 .Where(propertyDefinition => !string.IsNullOrWhiteSpace(propertyDefinition))
                 .ToList();
 
             // Join Property Definitions together.
-            var separator = settings.Formatting == Formatting.Indented ? ",\n" : ",";
+            var separator = settings.Formatting == Formatting.Indented ? ",\r\n" : ",";
             var definition = string.Join(separator, propertyDefinitions);
 
             // Assemble Serialized Definitions.

@@ -21,50 +21,50 @@ namespace XUnit.Random.JsonNetTests
         {
             const string nullableDateValueId = nameof(AttributesTestModel.NullableDateValueId);
 
-            var camelNullableDateValueId = nullableDateValueId.ToCamel();
+            var camelNullableDateValueId = nullableDateValueId.ToCamelConvention();
             camelNullableDateValueId.Should().NotBeNullOrWhiteSpace();
             camelNullableDateValueId.Should().BeEquivalentTo(CamelNullableDateValueId);
-            var camelNullableDateValueIdByConvention = nullableDateValueId.ToConvention(NamingConvention.Camel);
+            var camelNullableDateValueIdByConvention = nullableDateValueId.ToConvention(Convention.Camel);
             camelNullableDateValueIdByConvention.Should().NotBeNullOrWhiteSpace();
             camelNullableDateValueIdByConvention.Should().BeEquivalentTo(CamelNullableDateValueId);
             camelNullableDateValueId.Should().BeEquivalentTo(camelNullableDateValueIdByConvention);
 
-            var lowerNullableDateValueId = nullableDateValueId.ToLower();
+            var lowerNullableDateValueId = nullableDateValueId.ToLowerConvention();
             lowerNullableDateValueId.Should().NotBeNullOrWhiteSpace();
             lowerNullableDateValueId.Should().BeEquivalentTo(LowerNullableDateValueId);
-            var lowerNullableDateValueIdByConvention = nullableDateValueId.ToConvention(NamingConvention.Lower);
+            var lowerNullableDateValueIdByConvention = nullableDateValueId.ToConvention(Convention.Lower);
             lowerNullableDateValueIdByConvention.Should().NotBeNullOrWhiteSpace();
             lowerNullableDateValueIdByConvention.Should().BeEquivalentTo(LowerNullableDateValueId);
             lowerNullableDateValueId.Should().BeEquivalentTo(lowerNullableDateValueIdByConvention);
 
-            var pascalNullableDateValueId = nullableDateValueId.ToPascal();
+            var pascalNullableDateValueId = nullableDateValueId.ToPascalConvention();
             pascalNullableDateValueId.Should().NotBeNullOrWhiteSpace();
             pascalNullableDateValueId.Should().BeEquivalentTo(PascalNullableDateValueId);
-            var pascalNullableDateValueIdByConvention = nullableDateValueId.ToConvention(NamingConvention.Pascal);
+            var pascalNullableDateValueIdByConvention = nullableDateValueId.ToConvention(Convention.Pascal);
             pascalNullableDateValueIdByConvention.Should().NotBeNullOrWhiteSpace();
             pascalNullableDateValueIdByConvention.Should().BeEquivalentTo(PascalNullableDateValueId);
             pascalNullableDateValueId.Should().BeEquivalentTo(pascalNullableDateValueIdByConvention);
 
-            var snakeNullableDateValueId = nullableDateValueId.ToSnake();
+            var snakeNullableDateValueId = nullableDateValueId.ToSnakeConvention();
             snakeNullableDateValueId.Should().NotBeNullOrWhiteSpace();
             snakeNullableDateValueId.Should().BeEquivalentTo(SnakeNullableDateValueId);
-            var snakeNullableDateValueIdByConvention = nullableDateValueId.ToConvention(NamingConvention.Snake);
+            var snakeNullableDateValueIdByConvention = nullableDateValueId.ToConvention(Convention.Snake);
             snakeNullableDateValueIdByConvention.Should().NotBeNullOrWhiteSpace();
             snakeNullableDateValueIdByConvention.Should().BeEquivalentTo(SnakeNullableDateValueId);
             snakeNullableDateValueId.Should().BeEquivalentTo(snakeNullableDateValueIdByConvention);
 
-            var titleNullableDateValueId = nullableDateValueId.ToTitle();
+            var titleNullableDateValueId = nullableDateValueId.ToTitleConvention();
             titleNullableDateValueId.Should().NotBeNullOrWhiteSpace();
             titleNullableDateValueId.Should().BeEquivalentTo(TitleNullableDateValueId);
-            var titleNullableDateValueIdByConvention = nullableDateValueId.ToConvention(NamingConvention.Title);
+            var titleNullableDateValueIdByConvention = nullableDateValueId.ToConvention(Convention.Title);
             titleNullableDateValueIdByConvention.Should().NotBeNullOrWhiteSpace();
             titleNullableDateValueIdByConvention.Should().BeEquivalentTo(TitleNullableDateValueId);
             titleNullableDateValueId.Should().BeEquivalentTo(titleNullableDateValueIdByConvention);
 
-            var upperNullableDateValueId = nullableDateValueId.ToUpper();
+            var upperNullableDateValueId = nullableDateValueId.ToUpperConvention();
             upperNullableDateValueId.Should().NotBeNullOrWhiteSpace();
             upperNullableDateValueId.Should().BeEquivalentTo(UpperNullableDateValueId);
-            var upperNullableDateValueIdByConvention = nullableDateValueId.ToConvention(NamingConvention.Upper);
+            var upperNullableDateValueIdByConvention = nullableDateValueId.ToConvention(Convention.Upper);
             upperNullableDateValueIdByConvention.Should().NotBeNullOrWhiteSpace();
             upperNullableDateValueIdByConvention.Should().BeEquivalentTo(UpperNullableDateValueId);
             upperNullableDateValueId.Should().BeEquivalentTo(upperNullableDateValueIdByConvention);

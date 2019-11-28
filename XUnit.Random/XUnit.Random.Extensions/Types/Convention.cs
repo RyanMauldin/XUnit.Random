@@ -1,6 +1,6 @@
 ﻿namespace XUnit.Random.Extensions.Types
 {
-    public enum NamingConvention
+    public enum Convention
     {
         None = 0,
         Camel = 1,
