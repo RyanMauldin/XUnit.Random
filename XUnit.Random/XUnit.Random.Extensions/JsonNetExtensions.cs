@@ -2,30 +2,15 @@
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace XUnit.Random.Extensions
 {
     public static class JsonNetExtensions
     {
-        /// <summary>
-        /// Takes the first character of the string, and lowers the case of the first position. 
-        /// </summary>
-        /// <remarks>
-        /// This could also be ToLowerCamelCase, however this does not automatically convert the entire word or words
-        /// to lower camel case syntax, so the term here is to indicate usage, and its for parameters in our code,
-        /// where we know the usage and know the method is safe.
-        /// </remarks>
-        /// <param name="value">The value to make the first initial lowercase.</param>
-        /// <returns>A first letter lowercased version of the string value parameter value.</returns>
-        public static string ToParameterCase(this string value)
-        {
-            if (string.IsNullOrEmpty(value) || !char.IsLetter(value, 0) || char.IsLower(value, 0)) return value;
-            if (value.Length == 1) return value.ToLower(CultureInfo.InvariantCulture);
-            return value.Substring(0, 1).ToLower(CultureInfo.InvariantCulture) + value.Substring(1);
-        }
-
         public static string ToJsonPropertyAttributeName<T>(this T type, string name)
             where T : class
         {
@@ -46,7 +31,7 @@ namespace XUnit.Random.Extensions
             var propertyName = Convert.ToString(jsonTypedValue?.Value ?? string.Empty);
 
             // Return the JsonProperty Attribute PropertyName Value, otherwise return the provided name parameter value.
-            return string.IsNullOrWhiteSpace(propertyName) ? propertyName : name.ToParameterCase();
+            return string.IsNullOrWhiteSpace(propertyName) ? name.ToCamel() : propertyName;
         }
 
         public static bool IsEmittedProperty<T>(this T type, string name, JsonSerializerSettings settings = null)
@@ -127,11 +112,64 @@ namespace XUnit.Random.Extensions
             // Create output definition.
             var propertyInfo = type.GetType().GetProperty(name);
             var propertyValue = propertyInfo?.GetValue(type);
-            var value = propertyValue == null ? null : Convert.ToString(propertyValue);
+            var value = propertyValue.ToJsonPropertyDefinitionValueString(settings);
             var propertyName = type.ToJsonPropertyAttributeName(name);
             var indentPadding = settings.Formatting == Formatting.Indented ? "    " : string.Empty;
-            var serializedValue = value == null ? "null" : Convert.ToString(value, CultureInfo.CurrentCulture);
-            return $@"{indentPadding}""{propertyName}"":""{serializedValue}""";
+            return $@"{indentPadding}""{propertyName}"":{value}";
+        }
+
+        public static string ToJsonPropertyDefinitionValueString<T>(this T value, JsonSerializerSettings settings = null)
+        {
+            // Basic validation.
+            if (settings == null) settings = new JsonSerializerSettings();
+            if (value == null) return "null";
+            var valueType = Nullable.GetUnderlyingType(value.GetType()) != null
+                ? Nullable.GetUnderlyingType(value.GetType())?.Name
+                : value.GetType().Name;
+            switch (valueType)
+            {
+                case nameof(DateTime):
+                    var dateValue = Convert.ToDateTime(value);
+                    string returnValue;
+
+                    // Check for DateFormatString Json Setting.
+                    if (!string.IsNullOrWhiteSpace(settings.DateFormatString))
+                    {
+                        returnValue = dateValue.ToString(settings.DateFormatString);
+                        return $@"""{returnValue}""";
+                    }
+
+                    // Check for DateFormatHandling Json Setting.
+                    switch (settings.DateFormatHandling)
+                    {
+                        case DateFormatHandling.IsoDateFormat:
+                            returnValue = dateValue.ToString(new IsoDateTimeConverter().DateTimeFormat);
+                            return $@"""{returnValue}""";
+                        case DateFormatHandling.MicrosoftDateFormat:
+                            returnValue = dateValue.ToString(new DateTimeFormatInfo().FullDateTimePattern);
+                            return $@"""{returnValue}""";
+                        default:
+                            returnValue = Convert.ToString(dateValue.ToUnixTimestamp());
+                            return $@"""\/Date({returnValue})\/""";
+                    }
+                case nameof(Byte):
+                case nameof(SByte):
+                case nameof(UInt16):
+                case nameof(UInt32):
+                case nameof(UInt64):
+                case nameof(Int16):
+                case nameof(Int32):
+                case nameof(Int64):
+                case nameof(Decimal):
+                case nameof(Double):
+                case nameof(Single):
+                    // Handle Numeric Values
+                    return Convert.ToString(value);
+                default:
+                    // Wrap string values or other values.
+                    returnValue = Convert.ToString(value);
+                    return $@"""{returnValue}""";
+            }
         }
 
         public static string ToJsonDefinition<T>(this T type, JsonSerializerSettings settings = null)
@@ -149,7 +187,7 @@ namespace XUnit.Random.Extensions
                 .ToList();
 
             // Join Property Definitions together.
-            var separator = settings.Formatting == Formatting.Indented ? ",\n" : "";
+            var separator = settings.Formatting == Formatting.Indented ? ",\n" : ",";
             var definition = string.Join(separator, propertyDefinitions);
 
             // Assemble Serialized Definitions.
