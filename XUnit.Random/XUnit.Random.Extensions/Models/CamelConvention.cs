@@ -109,22 +109,16 @@ namespace XUnit.Random.Extensions.Models
                             continue;
                         }
 
-                        // Set our global lookahead flag to true.
-                        isFirstUpperSet = true;
-
                         // If it is the first character for any word, and no existing numbers have been placed,
                         // it should be a lowercase letter.
                         if (wordBuilder.Length == 0 && subWordBuilder.Length == 0)
                         {
-                            // Append lowercase letter and move on.
-                            subWordBuilder.Append(wordCharacter);
-                        }
-                        else
-                        {
-                            // Otherwise, append uppercase letter and move on.
-                            subWordBuilder.Append(char.ToUpper(wordCharacter, cultureInfo));
+                            // Set our global lookahead flag to true.
+                            isFirstUpperSet = true;
                         }
 
+                        // Append lowercase letter and move on.
+                        subWordBuilder.Append(wordCharacter);
                         continue;
                     }
 
